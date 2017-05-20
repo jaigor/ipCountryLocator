@@ -19,7 +19,8 @@ with open(sys.argv[1],'r') as database, open(sys.argv[2],'r') as ranges, open(sy
     # output header
     results.writerow(('Ip','Country'))
     
-    # store the files in memory if they are not too large
+    # stores input files in each array:
+    # careful with the size of files
     data1 = []
     data2 = []
     for row in reader1:
@@ -36,7 +37,3 @@ with open(sys.argv[1],'r') as database, open(sys.argv[2],'r') as ranges, open(sy
                 # write the ip in the output file
                 results.writerow((i.rstrip(), j[3]))
                 break # when ip matches, exits loop
-
-database.close()
-ranges.close()
-wr.close()
