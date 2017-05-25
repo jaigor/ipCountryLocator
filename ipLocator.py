@@ -1,5 +1,4 @@
 import sys
-import csv
 
 # convert ip to integer
 def ipToNum(ip):
@@ -9,31 +8,35 @@ def ipToNum(ip):
         num = num * 256 + int(octal)
     return num
 
-# main
-with open(sys.argv[1],'r') as database, open(sys.argv[2],'r') as ranges, open(sys.argv[3], 'w') as wr:
-    
-    # open all files passed by args
-    reader1 = csv.reader(database)
-    reader2 = csv.reader(ranges)
-    results = csv.writer(wr, quoting=csv.QUOTE_NONNUMERIC)
-    # output header
-    results.writerow(('Ip','Country'))
-    
-    # stores input files in each array:
-    # careful with the size of files
-    data1 = []
-    data2 = []
-    for row in reader1:
-        data1.append(row[0])
-    for row in reader2:
-        data2.append(row)
+def countryLookUp(formatIP, ranges):
+    for r in ranges:
+        if formatIP <= r[1]:
+            if formatIP >= r[0]:
+                return r[2]
 
-    #check the range of the ips    
-    for i in data1:
-        for j in data2:
-            formatIp = ipToNum(i)
-            if (formatIp >= int(j[0]) and
-                formatIp <= int(j[1])):
-                # write the ip in the output file
-                results.writerow((i.rstrip(), j[3]))
-                break # when ip matches, exits loop
+# main
+file1 = sys.argv[1]
+file2 = sys.argv[2]
+fileout = sys.argv[3]
+    
+ips = []
+with open (file1, 'r') as db:
+    for line in db:
+        # delete invalid chars
+        ips.append(line.replace('"', '').replace("\n",""))
+rng = []
+with open (file2, 'r') as ranges:
+    for line in ranges:
+        l =  line.replace('"',"")
+        l = l.split(",")
+        country = l[3]
+        rng.append((int(l[0]),int(l[1]),country))        
+results = []
+for ip in ips:
+    formatIP = ipToNum(ip)
+    country = countryLookUp (formatIP,rng)
+    results.append((ip, country))
+ 
+with open (fileout, 'w') as fout:
+    for r in results:
+        fout.write(str(r[0])+","+str(r[1]))
